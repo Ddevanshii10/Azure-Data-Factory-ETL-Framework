@@ -1,37 +1,5 @@
 # Azure Data Factory ETL Framework
 ### Metadata-Driven Data Ingestion, Orchestration, and Transformation using Azure Data Factory
----
-
----
-
-## Architecture Diagram
-
-| 1. Ingestion Phase (Event-Driven)                                                                |
-| - A file lands in 'source/csvfiles/Fact_Sales_1.csv'.                                           |
-| - 'MainTrigger' starts the 'pipelinemanager' pipeline.                                           |
-| - File is copied to 'destination/csvfiles/' and deleted from 'source/'.                          |
-+--------------------------------------------------------------------------------------------------+
-|
-v
-+--------------------------------------------------------------------------------------------------+
-| 2. Orchestration & Staging Phase (Scheduled)                                                     |
-| - Every 15 minutes, 'selectedFilesTrigger' fires and triggers 'OnlySelectedFiles'.              |
-| - 'Get Metadata1' reads all filenames under 'destination/csvfiles/'.                             |
-| - 'ForEachCSV' loops over each file name.                                                        |
-| - 'IfFileMatches' checks if the name starts with 'Fact'.                                         |
-| - Matching files are copied to 'reporting/csvfiles/' using parameterized datasets.              |
-+--------------------------------------------------------------------------------------------------+
-|
-v
-+--------------------------------------------------------------------------------------------------+
-| 3. Transformation Phase (Compute-Driven)                                                         |
-| - 'ExecuteDataFlow' starts the 'Transform_csv' mapping data flow.                                |
-| - Transaction records load, selecting required columns and filtering out customer 12.            |
-| - Visa transactions are grouped and aggregated to find the max product ID.                       |
-| - Cleaned output writes to 'reporting/dataflowOutput/'.                                          |
-+--------------------------------------------------------------------------------------------------+
-
----
 
 ---
 
@@ -156,7 +124,8 @@ The pipelines orchestrate control flow and data movement tasks using success/dep
 
 ## 6. Repository Structure
 The physical layout of the repository matches the native structure exported by Azure Data Factory:
-Data Pipelines/ ├── dataflow/ │ └── Transform_csv.json # Mapping Data Flow logic ├── dataset/ │ ├── CSV_source.json # ADLS Gen2 landing dataset (Fact_Sales_1.csv) │ ├── MetaData.json # ADLS Gen2 metadata reader dataset │ ├── Sink_csv.json # ADLS Gen2 staging dataset for copy tasks │ ├── dataflow_source.json # Source schema mapping for the dataflow │ ├── dataflow_sink.json # Destination schema mapping for the dataflow │ ├── param_source.json # Parameterized staging dataset │ ├── reporting_sink.json # Parameterized reporting dataset │ ├── source_git.json # HTTP endpoint dataset pointing to Git │ └── sink_git.json # ADLS Gen2 staging target for Git data ├── factory/ │ └── adfdevanshi.json # Data Factory resource definition metadata ├── linkedService/ │ ├── LinkedServices1.json # Connection to primary storage (storagedevanshi) │ └── Linked_Git.json # Connection to HTTP source raw.githubusercontent.com ├── pipeline/ │ ├── OnlySelectedFiles.json # Metadata scanner & transformation trigger pipeline │ ├── VarPipeline.json # Pipeline variable demonstration │ ├── pipeline Git.json # HTTP-to-staging copy pipeline │ └── pipelinemanager.json # Landing-to-staging copy & delete pipeline ├── trigger/ │ ├── MainTrigger.json # Event trigger for landing folder uploads │ ├── managerTRigger.json # Standby event trigger for landing files │ └── selectedFilesTrigger.json # Recurring 15-minute schedule trigger └── publish_config.json # ADF deployment configuration for adf_publish branch
+Data Pipelines/ 
+├── dataflow/ │ └── Transform_csv.json # Mapping Data Flow logic ├── dataset/ │ ├── CSV_source.json # ADLS Gen2 landing dataset (Fact_Sales_1.csv) │ ├── MetaData.json # ADLS Gen2 metadata reader dataset │ ├── Sink_csv.json # ADLS Gen2 staging dataset for copy tasks │ ├── dataflow_source.json # Source schema mapping for the dataflow │ ├── dataflow_sink.json # Destination schema mapping for the dataflow │ ├── param_source.json # Parameterized staging dataset │ ├── reporting_sink.json # Parameterized reporting dataset │ ├── source_git.json # HTTP endpoint dataset pointing to Git │ └── sink_git.json # ADLS Gen2 staging target for Git data ├── factory/ │ └── adfdevanshi.json # Data Factory resource definition metadata ├── linkedService/ │ ├── LinkedServices1.json # Connection to primary storage (storagedevanshi) │ └── Linked_Git.json # Connection to HTTP source raw.githubusercontent.com ├── pipeline/ │ ├── OnlySelectedFiles.json # Metadata scanner & transformation trigger pipeline │ ├── VarPipeline.json # Pipeline variable demonstration │ ├── pipeline Git.json # HTTP-to-staging copy pipeline │ └── pipelinemanager.json # Landing-to-staging copy & delete pipeline ├── trigger/ │ ├── MainTrigger.json # Event trigger for landing folder uploads │ ├── managerTRigger.json # Standby event trigger for landing files │ └── selectedFilesTrigger.json # Recurring 15-minute schedule trigger └── publish_config.json # ADF deployment configuration for adf_publish branch
 
 
 
@@ -267,9 +236,10 @@ Trigger configuration profiles control automated execution:
 
 ## 12. ETL Workflow
 The system progresses data through a three-stage lifecycle:
-+--------------------------------------------------------------------------------------------------+ | 1. Ingestion Phase (Event-Driven) | | - A file lands in 'source/csvfiles/Fact_Sales_1.csv'. | | - 'MainTrigger' starts the 'pipelinemanager' pipeline. | | - File is copied to 'destination/csvfiles/' and deleted from 'source/'. | +--------------------------------------------------------------------------------------------------+ | v +--------------------------------------------------------------------------------------------------+ | 2. Orchestration & Staging Phase (Scheduled) | | - Every 15 minutes, 'selectedFilesTrigger' fires and triggers 'OnlySelectedFiles'. | | - 'Get Metadata1' reads all filenames under 'destination/csvfiles/'. | | - 'ForEachCSV' loops over each file name. | | - 'IfFileMatches' checks if the name starts with 'Fact'. | | - Matching files are copied to 'reporting/csvfiles/' using parameterized datasets. | +--------------------------------------------------------------------------------------------------+ | v +--------------------------------------------------------------------------------------------------+ | 3. Transformation Phase (Compute-Driven) | | - 'ExecuteDataFlow' starts the 'Transform_csv' mapping data flow. | | - Transaction records load, selecting required columns and filtering out customer 12. | | - Visa transactions are grouped and aggregated to find the max product ID. | | - Cleaned output writes to 'reporting/dataflowOutput/'. | +--------------------------------------------------------------------------------------------------+
-
-
++--------------------------------------------------------------------------------------------------+ | 
+1. Ingestion Phase (Event-Driven) | | - A file lands in 'source/csvfiles/Fact_Sales_1.csv'. | | - 'MainTrigger' starts the 'pipelinemanager' pipeline. | | - File is copied to 'destination/csvfiles/' and deleted from 'source/'. | +--------------------------------------------------------------------------------------------------+ | v +--------------------------------------------------------------------------------------------------+ |
+2. Orchestration & Staging Phase (Scheduled) | | - Every 15 minutes, 'selectedFilesTrigger' fires and triggers 'OnlySelectedFiles'. | | - 'Get Metadata1' reads all filenames under 'destination/csvfiles/'. | | - 'ForEachCSV' loops over each file name. | | - 'IfFileMatches' checks if the name starts with 'Fact'. | | - Matching files are copied to 'reporting/csvfiles/' using parameterized datasets. | +--------------------------------------------------------------------------------------------------+ | v +--------------------------------------------------------------------------------------------------+ |
+3. Transformation Phase (Compute-Driven) | | - 'ExecuteDataFlow' starts the 'Transform_csv' mapping data flow. | | - Transaction records load, selecting required columns and filtering out customer 12. | | - Visa transactions are grouped and aggregated to find the max product ID. | | - Cleaned output writes to 'reporting/dataflowOutput/'. | +--------------------------------------------------------------------------------------------------+
 
 ---
 
